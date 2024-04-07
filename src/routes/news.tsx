@@ -1,31 +1,9 @@
 import { A } from "@solidjs/router";
 import { createAsync, cache } from "@solidjs/router";
 import { format } from "date-fns";
+import { fetchNewsStories } from "~/utils/api";
 
-export interface NewsStory {
-    title: string;
-    url: string;
-    id: number;
-    score: number;
-    time: number;
-    descendants: number;
-};
-
-const getNewsStories = cache(async (): Promise<NewsStory[]> => {
-    "use server";
-    const response = await fetch("https://hacker-news.firebaseio.com/v0/topstories.json");
-    const storyIds = await response.json();
-
-    const storiesDetails = await Promise.all(storyIds.map((id: number) => {
-        // eslint-disable-next-line no-async-promise-executor
-        return new Promise<NewsStory>(async (resolve): Promise<void> => {
-            const story = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
-            const storyDetails = await story.json();
-            resolve(storyDetails);
-        });
-    }));
-    return storiesDetails;
-}, "newsStories");
+const getNewsStories = cache(fetchNewsStories, "newsStories");
 
 export const route = {
     load: () => getNewsStories()
