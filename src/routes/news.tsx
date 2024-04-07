@@ -40,7 +40,7 @@ export default function News() {
             </h1>
             <ul class="container flex flex-col">
                 {newsStories() && newsStories()?.map((story) => (
-                    <li class="m-2 bg-slate-100 p-2 flex flex-col">
+                    <li class="m-2 bg-slate-100 p-2 flex flex-col border-b border-slate-400">
                         <a class="text-xl hover:text-slate-800 hover:underline" href={story.url}>{story.title}</a>
                         <p>
                             <span class="text-slate-500 pr-1 text-xs">

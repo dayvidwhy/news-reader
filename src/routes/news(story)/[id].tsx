@@ -1,19 +1,25 @@
+import { For } from "solid-js";
 import { createAsync, cache, useParams } from "@solidjs/router";
 import { format } from "date-fns";
-import { NewsStory } from "../news";
+import type { NewsStory } from "../news";
 
 interface NewsComments {
     by: string;
     id: number;
-    kids: number[];
+    kids: number[] | undefined;
     parent: number;
     text: string;
     time: number;
     type: string;
 };
 
+interface CommentTree {
+    comment: NewsComments;
+    kids: CommentTree[] | undefined;
+};
+
 const getNewsStoryComments = cache(async (id): Promise<{
-    kids: NewsComments[];
+    kids: CommentTree | undefined;
     story: NewsStory;
 }> => {
     "use server";
@@ -21,53 +27,55 @@ const getNewsStoryComments = cache(async (id): Promise<{
     const story = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
     const storyDetails = await story.json();
 
-    const storyComments = await Promise.all(storyDetails.kids.map((commentId: number) => {
-        // eslint-disable-next-line no-async-promise-executor
-        return new Promise<NewsComments>(async (resolve): Promise<void> => {
-            const comment = await fetch(`https://hacker-news.firebaseio.com/v0/item/${commentId}.json`);
-            const commentDetails = await comment.json();
-            resolve(commentDetails);
-        });
-    }));
+    const getChildComments = async (commentId: number): Promise<CommentTree> => {
+        const comment = await fetch(`https://hacker-news.firebaseio.com/v0/item/${commentId}.json`);
+        const commentDetails = await comment.json();
+
+        return {
+            comment: commentDetails,
+            kids: commentDetails.kids ? await Promise.all(commentDetails.kids.map((childCommentId: number) => getChildComments(childCommentId))) : undefined
+        };
+    };
+
     return {
-        story: storyDetails,
-        kids: storyComments
+        kids: storyDetails.kids ? await getChildComments(storyDetails.id) : undefined,
+        story: storyDetails
     };
 }, "newsStoryComments");
 
 export const route = {
-    load: () => {
-        const { id } = useParams();
-        getNewsStoryComments(id);
-    }
+    load: () =>  getNewsStoryComments(useParams().id)
+};
+
+const renderComment = (commentData: CommentTree) => {
+    return (
+        <div class="m-2 pl-2 bg-slate-100 border-l border-slate-400">
+            <p>
+                <span>{`By ${commentData.comment.by}`}</span>
+                <span>{`at ${format(new Date(commentData.comment.time), "pp").toLowerCase()}`}</span>
+                <span>{commentData.comment.id}</span>
+            </p>
+            <p class="text-xs">
+                {commentData.comment.text}
+            </p>
+            <div class="pl">
+                {<For each={commentData.kids}>{renderComment}</For>}
+            </div>
+        </div>
+    );
 };
 
 export default function NewsId() {
     const { id } = useParams();
     const newsStoryComments = createAsync(() => getNewsStoryComments(id));
+
     return (
         <main class="container mx-auto mt-2">
-            <h1 class="text-2xl">
+            <a href={newsStoryComments() && newsStoryComments()?.story.url} class="text-2xl hover:underline">
                 {newsStoryComments() && newsStoryComments()?.story.title}
-            </h1>
+            </a>
             <div class="flex flex-col">
-                {newsStoryComments() && newsStoryComments()?.kids.map((comment) => {
-                    return (
-                        <div class="m-2 p-2 bg-slate-100">
-                            <p>
-                                <span>
-                                    By {comment.by}
-                                </span>
-                                <span>
-                                    at {format(new Date(comment.time), "pp").toLowerCase()}
-                                </span>
-                            </p>
-                            <p class="text-xs">
-                                {comment.text}
-                            </p>
-                        </div>
-                    );
-                })}
+                {newsStoryComments() && newsStoryComments()?.kids?.kids?.map(renderComment)}
             </div>
         </main>
     );
