@@ -1,3 +1,4 @@
+import { For } from "solid-js";
 import { A } from "@solidjs/router";
 import { createAsync, cache } from "@solidjs/router";
 import { format } from "date-fns";
@@ -17,7 +18,7 @@ export default function News() {
                 Top Stories
             </h1>
             <ul class="container flex flex-col">
-                {newsStories() && newsStories()?.map((story) => (
+                {<For each={newsStories()}>{(story) => (
                     <li class="m-2 bg-slate-100 p-2 flex flex-col border-b border-slate-400">
                         <a class="text-xl hover:text-slate-800 hover:underline" href={story.url}>{story.title}</a>
                         <p>
@@ -32,7 +33,7 @@ export default function News() {
                             </A>
                         </p>
                     </li>
-                ))}
+                )}</For>}
             </ul>
         </main>
     );

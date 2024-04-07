@@ -1,3 +1,4 @@
+import { For } from "solid-js";
 import { createAsync, cache, useParams } from "@solidjs/router";
 import { fetchNewsStoryComments } from "~/utils/api";
 import { Comments } from "~/components/Comments";
@@ -14,21 +15,21 @@ export default function NewsId() {
 
     return (
         <main class="container mx-auto mt-2">
-            <a href={newsStoryComments() && newsStoryComments()?.story.url} class="text-2xl hover:underline">
-                {newsStoryComments() && newsStoryComments()?.story.title}
+            <a href={newsStoryComments()?.story.url} class="text-2xl hover:underline">
+                {newsStoryComments()?.story.title}
             </a>
             <p>
                 <span class="text-slate-500 text-xs">
-                    {`${newsStoryComments() && newsStoryComments()?.story.score}pts - `}
+                    {`${newsStoryComments()?.story.score}pts - `}
                 </span>
                 <span class="text-slate-500 text-xs">
-                    {`By ${newsStoryComments() && newsStoryComments()?.story.by}`}
+                    {`By ${newsStoryComments()?.story.by}`}
                 </span>
             </p>
             <div class="flex flex-col">
-                {newsStoryComments() && newsStoryComments()?.kids?.kids?.map((commentData => {
+                {<For each={newsStoryComments()?.kids?.kids}>{commentData => {
                     return <Comments {...commentData} />;
-                }))}
+                }}</For>}
             </div>
         </main>
     );
