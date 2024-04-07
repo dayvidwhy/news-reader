@@ -16,6 +16,7 @@ export interface NewsStory {
     score: number;
     time: number;
     descendants: number;
+    by: string;
 };
 
 export interface CommentTree {
@@ -50,7 +51,6 @@ export const fetchNewsStoryComments = async (id: string): Promise<{
     const getChildComments = async (commentId: number): Promise<CommentTree> => {
         const comment = await fetch(`${BASE_URL}/item/${commentId}.json`);
         const commentDetails = await comment.json();
-
         return {
             comment: commentDetails,
             kids: commentDetails.kids ? await Promise.all(commentDetails.kids.map((childCommentId: number) => getChildComments(childCommentId))) : undefined

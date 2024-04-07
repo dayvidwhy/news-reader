@@ -4,8 +4,8 @@ import type { CommentTree } from "~/utils/api";
 
 export const Comments = (commentData: CommentTree) => {
     return (
-        <div class="m-2 pl-2 bg-slate-100 border-l border-slate-400">
-            <p class="text-xs">
+        <div class="m-2 pl-2 pt-2 bg-slate-100 border-l border-slate-200">
+            <p class="text-xs text-wrap break-words">
                 {commentData.comment.text}
             </p>
             <p class="text-slate-500 text-xs">
