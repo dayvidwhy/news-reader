@@ -15,7 +15,7 @@ export default function NewsId() {
 
     return (
         <main class="container mx-auto mt-2">
-            <a href={newsStoryComments()?.story.url} class="text-2xl hover:underline">
+            <a href={newsStoryComments()?.story.url} target="_blank" class="text-2xl hover:underline">
                 {newsStoryComments()?.story.title}
             </a>
             <p>
