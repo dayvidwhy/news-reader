@@ -3,6 +3,7 @@ import { A } from "@solidjs/router";
 import { createAsync, cache } from "@solidjs/router";
 import { formatWhenDateWas } from "~/utils/dates";
 import { fetchNewsStories } from "~/utils/api";
+import { formatUrl } from "~/utils/urls";
 
 const getNewsStories = cache(fetchNewsStories, "newsStories");
 
@@ -10,19 +11,10 @@ export const route = {
     load: () => getNewsStories()
 };
 
-const formatUrl = (url: string) => {
-    try {
-        const formattedUrl = new URL(url).hostname;
-        return `(${formattedUrl})`;
-    } catch (error) {
-        return "";
-    }
-};
-
 export default function News() {
     const newsStories = createAsync(() => getNewsStories());
     return (
-        <main class="container pt-2 mx-auto">
+        <main class="container pt-2 mx-auto flex flex-col flex-1 overflow-y-auto">
             <h1 class="text-2xl">
                 Top Stories
             </h1>
