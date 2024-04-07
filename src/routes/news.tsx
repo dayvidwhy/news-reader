@@ -2,7 +2,7 @@ import { A } from "@solidjs/router";
 import { createAsync, cache } from "@solidjs/router";
 import { format } from "date-fns";
 
-interface NewsStory {
+export interface NewsStory {
     title: string;
     url: string;
     id: number;
@@ -21,14 +21,7 @@ const getNewsStories = cache(async (): Promise<NewsStory[]> => {
         return new Promise<NewsStory>(async (resolve): Promise<void> => {
             const story = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
             const storyDetails = await story.json();
-            resolve({
-                title: storyDetails.title,
-                url: storyDetails.url,
-                id: storyDetails.id,
-                score: storyDetails.score,
-                time: storyDetails.time,
-                descendants: storyDetails.descendants
-            });
+            resolve(storyDetails);
         });
     }));
     return storiesDetails;
@@ -42,7 +35,7 @@ export default function News() {
     const newsStories = createAsync(() => getNewsStories());
     return (
         <main class="container pt-2 mx-auto">
-            <h1 class="text-4xl">
+            <h1 class="text-2xl">
                 Top Stories
             </h1>
             <ul class="container flex flex-col">
