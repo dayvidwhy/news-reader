@@ -1,6 +1,6 @@
 import { For, Show, createSignal } from "solid-js";
-import { format } from "date-fns";
 import type { CommentTree } from "~/utils/api";
+import { formatWhenDateWas } from "~/utils/dates";
 
 export const Comments = (commentData: CommentTree) => {
     const [visibile, setVisibile] = createSignal(true);
@@ -10,17 +10,15 @@ export const Comments = (commentData: CommentTree) => {
                 {visibile() ? "hide" : "show"}
             </button>
             <Show when={visibile()}>
-                <div>
-                    <p class="text-xs text-wrap break-words">
-                        {commentData.comment.text}
-                    </p>
-                    <p class="text-slate-500 text-xs">
-                        <span>{`By ${commentData.comment.by}`}</span>
-                        <span class="pl-1">{`at ${format(new Date(commentData.comment.time), "pp").toLowerCase()}`}</span>
-                    </p>
-                    <div class="pl">
-                        {<For each={commentData.kids}>{Comments}</For>}
-                    </div>
+                <p class="text-xs text-wrap break-words">
+                    {commentData.comment.text}
+                </p>
+                <p class="text-slate-500 text-xs">
+                    <span>{`By ${commentData.comment.by} - `}</span>
+                    <span>{formatWhenDateWas(commentData.comment.time)}</span>
+                </p>
+                <div class="pl mb-1">
+                    {<For each={commentData.kids}>{Comments}</For>}
                 </div>
             </Show>
         </div>

@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 import { A } from "@solidjs/router";
 import { createAsync, cache } from "@solidjs/router";
-import { format } from "date-fns";
+import { formatWhenDateWas } from "~/utils/dates";
 import { fetchNewsStories } from "~/utils/api";
 
 const getNewsStories = cache(fetchNewsStories, "newsStories");
@@ -33,14 +33,17 @@ export default function News() {
                         <a href={story.url} target="_blank" class="text-xs text-slate-600 hover:underline">
                             {formatUrl(story.url)}
                         </a>
-                        <p>
-                            <span class="text-slate-500 pr-1 text-xs">
+                        <p class="text-slate-500 text-xs">
+                            <span>
                                 {`${story.score}pts - `}
                             </span>
-                            <span class="text-slate-500 text-xs">
-                                {`${format(new Date(story.time), "pp").toLowerCase()} - `}
+                            <span>
+                                {formatWhenDateWas(story.time)}
                             </span>
-                            <A href={`/news/${story.id}`} class="text-slate-500 text-xs pl-1 hover:underline">
+                            <span>
+                                {" - "}
+                            </span>
+                            <A href={`/news/${story.id}`} class="hover:underline">
                                 {`${story.descendants || "0"} ${story.descendants !== 1 ? "comments" : "comment"}`}
                             </A>
                         </p>
