@@ -1,7 +1,7 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { createAsync, cache, useParams } from "@solidjs/router";
 import { fetchNewsStoryComments } from "~/utils/api";
-import { formatUrl } from "~/utils/urls";
+import { Story } from "~/components/Story";
 import { Comments } from "~/components/Comments";
 
 const getNewsStoryComments = cache(fetchNewsStoryComments, "newsStoryComments");
@@ -16,24 +16,11 @@ export default function NewsId() {
 
     return (
         <main class="container mx-auto mt-2 flex-1 overflow-y-hidden flex flex-col">
-            <div>
-                <a href={newsStoryComments()?.story.url} target="_blank" class="text-2xl hover:underline">
-                    {newsStoryComments()?.story.title}
-                </a>
-                <p>
-                    <a href={newsStoryComments()?.story.url} target="_blank" class="text-xs text-slate-600 hover:underline">
-                        {formatUrl(newsStoryComments()?.story.url)}
-                    </a>
-                </p>
-                <p>
-                    <span class="text-slate-500 text-xs">
-                        {`${newsStoryComments()?.story.score}pts - `}
-                    </span>
-                    <span class="text-slate-500 text-xs">
-                        {`By ${newsStoryComments()?.story.by}`}
-                    </span>
-                </p>
-            </div>
+            <Show when={newsStoryComments()?.story}>
+                {/* The Show condition asserts this is not null.
+                // @ts-ignore */}
+                <Story {...newsStoryComments().story} />
+            </Show>
             <div class="flex-1 overflow-y-auto">
                 <div class="flex flex-col">
                     {<For each={newsStoryComments()?.kids?.kids}>{commentData => {
