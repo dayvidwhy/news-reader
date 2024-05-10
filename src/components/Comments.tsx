@@ -17,7 +17,7 @@ export const Comments = (commentData: CommentTree) => {
                     <span>{`By ${commentData.comment.by} - `}</span>
                     <span>{formatWhenDateWas(commentData.comment.time)}</span>
                 </p>
-                <div class="pl mb-1">
+                <div class="mb-1">
                     {<For each={commentData.kids}>{Comments}</For>}
                 </div>
             </Show>
